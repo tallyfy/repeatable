@@ -1,0 +1,14 @@
+{
+  "name": "repeatable",
+  "displayName": "Repeatable",
+  "version": "0.1.0",
+  "description": "Turn your Claude Code sessions into repeatable processes in Tallyfy.",
+  "author": {
+    "name": "Tallyfy, Inc.",
+    "url": "https://tallyfy.com"
+  },
+  "homepage": "https://github.com/tallyfy/repeatable",
+  "repository": "https://github.com/tallyfy/repeatable",
+  "license": "MIT",
+  "keywords": ["tallyfy", "process", "sop", "automation", "workflow"]
+}

@@ -1,0 +1,17 @@
+{
+  "description": "Repeatable: queue finished sessions for local indexing. The hook writes one small queue file and exits immediately; a detached worker does all parsing after the session has ended.",
+  "hooks": {
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/enqueue.js"],
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

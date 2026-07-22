@@ -1,0 +1,17 @@
+{
+  "name": "tallyfy",
+  "description": "Official Tallyfy plugins for Claude Code.",
+  "owner": {
+    "name": "Tallyfy, Inc.",
+    "email": "support@tallyfy.com"
+  },
+  "plugins": [
+    {
+      "name": "repeatable",
+      "source": "./",
+      "description": "Turn your Claude Code sessions into repeatable processes in Tallyfy.",
+      "category": "productivity",
+      "tags": ["tallyfy", "sop", "process", "workflow"]
+    }
+  ]
+}

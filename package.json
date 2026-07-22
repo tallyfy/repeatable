@@ -1,0 +1,12 @@
+{
+  "name": "repeatable-plugin",
+  "private": true,
+  "description": "Claude Code plugin: turn your Claude Code sessions into repeatable processes in Tallyfy. Zero runtime dependencies.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "test": "node --test test/"
+  }
+}
