@@ -1,0 +1,29 @@
+# Dependencies (dev only; the plugin has zero runtime dependencies)
+node_modules/
+
+# Local data: the plugin's index, queue, and logs never belong in git
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+*.db-wal
+*.db-shm
+data/
+queue/
+logs/
+
+# Environment and secrets
+.env
+.env.*
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+
+# Test scratch output
+test/tmp/
+coverage/
