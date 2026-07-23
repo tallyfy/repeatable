@@ -6,7 +6,7 @@ when the `version` field in `.claude-plugin/plugin.json` changes.
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-07-22
+## [0.1.0] - 2026-07-23
 
 Initial public version.
 
