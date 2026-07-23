@@ -1,5 +1,7 @@
 # Repeatable
 
+[![ci](https://github.com/tallyfy/repeatable/actions/workflows/ci.yml/badge.svg)](https://github.com/tallyfy/repeatable/actions/workflows/ci.yml)
+
 Turn your Claude Code sessions into repeatable processes in Tallyfy.
 
 You keep doing the same kind of session: the weekly release, the customer

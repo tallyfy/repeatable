@@ -1,0 +1,7 @@
+{"type":"user","message":{"role":"user","content":[{"type":"text","text":"Run the quarterly access review for the fake team"}]},"timestamp":"2026-07-01T10:00:00.000Z","cwd":"/home/tester/fakerepo","sessionId":"fixture-gen2","newFieldFromFutureVersion":{"nested":true}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tu1","name":"Grep","input":{"pattern":"access"}}]},"timestamp":"2026-07-01T10:01:00.000Z","cwd":"/home/tester/fakerepo","anotherUnknownField":123}
+{"type":"brand-new-entry-kind","payload":{"whatever":"the future holds"},"timestamp":"2026-07-01T10:02:00.000Z"}
+{"type":"user","message":{"role":"user","content":"Summarize who still has access and draft removals"},"timestamp":"2026-07-01T10:03:00.000Z","cwd":"/home/tester/fakerepo"}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tu2","name":"Write","input":{"file_path":"review.md"}}]},"timestamp":"2026-07-01T10:04:00.000Z","cwd":"/home/tester/fakerepo"}
+{"type":"progress","note":"synthetic progress line","timestamp":"2026-07-01T10:05:00.000Z"}
+{"type":"summary","summary":"synthetic gen2 summary","leafUuid":"bb"}

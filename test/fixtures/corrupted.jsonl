@@ -1,0 +1,12 @@
+{"type":"user","message":{"role":"user","content":"One valid prompt in a sea of noise"},"timestamp":"2026-07-02T11:00:00.000Z","cwd":"/home/tester/fakerepo"}
+this line is not json at all
+{"type":"mystery-shape-a","x":1}
+{"type":"mystery-shape-b","y":2}
+{broken json here
+{"type":"mystery-shape-c","z":3}
+also definitely not json
+{"type":"mystery-shape-d","w":4}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t","name":"Read","input":{}}]},"timestamp":"2026-07-02T11:01:00.000Z","cwd":"/home/tester/fakerepo"}
+{"type":"mystery-shape-e","v":5}
+{"type":"mystery-shape-f","u":6}
+{"type":"mystery-shape-g","t":7}

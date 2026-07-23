@@ -1,0 +1,35 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [22, 24]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Run tests (zero dependencies, nothing to install)
+        run: node --test
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No JWT-like strings outside documented pattern references
+        run: |
+          hits=$(grep -rn "eyJ" --exclude-dir=.git . | grep -vE '(redact|REDACTED|no-network|secret[- ]scan|drafting)' || true)
+          if [ -n "$hits" ]; then echo "$hits"; exit 1; fi
+      - name: ASCII-only committed files
+        run: |
+          hits=$(LC_ALL=C grep -rlP '[^\x00-\x7F]' --exclude-dir=.git . || true)
+          if [ -n "$hits" ]; then echo "non-ASCII found in:"; echo "$hits"; exit 1; fi
