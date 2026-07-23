@@ -25,9 +25,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: No JWT-like strings outside documented pattern references
+      - name: No JWT-like strings outside the redaction fixtures
         run: |
-          hits=$(grep -rn "eyJ" --exclude-dir=.git . | grep -vE '(redact|REDACTED|no-network|secret[- ]scan|drafting)' || true)
+          # Token-shaped only (eyJ + 8 base64url chars): prose mentions of
+          # the bare eyJ prefix are fine; the redaction code and its test
+          # fixtures are the only files allowed to contain shaped fakes.
+          hits=$(grep -rnE "eyJ[A-Za-z0-9_-]{8,}" --exclude-dir=.git . | grep -vE '^(\./)?(worker/redact\.js|test/redact\.test\.js):' || true)
           if [ -n "$hits" ]; then echo "$hits"; exit 1; fi
       - name: ASCII-only committed files
         run: |
