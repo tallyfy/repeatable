@@ -21,8 +21,11 @@ const { spawn } = require('child_process');
 const STDIN_TIMEOUT_MS = 1500;
 
 function dataDir() {
-  // Claude Code exports CLAUDE_PLUGIN_DATA to hook processes. The
-  // fallback below only matters for manual/dev invocation.
+  // Same resolution order as worker/paths.js (kept inline because this
+  // script must stay dependency-free and fast): test override first,
+  // then CLAUDE_PLUGIN_DATA (exported by Claude Code to hook processes),
+  // then a dev fallback.
+  if (process.env.REPEATABLE_DATA_DIR) return process.env.REPEATABLE_DATA_DIR;
   if (process.env.CLAUDE_PLUGIN_DATA) return process.env.CLAUDE_PLUGIN_DATA;
   const configDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
   return path.join(configDir, 'plugins', 'data', 'repeatable');

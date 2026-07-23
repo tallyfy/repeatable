@@ -126,6 +126,7 @@ function parseTranscript(transcriptPath) {
     toolCalls: [],
     startedAt: null,
     endedAt: null,
+    cwd: null,
     lineCount: 0,
     skipped: 0,
     contentBytes: 0,
@@ -173,6 +174,9 @@ function parseTranscript(transcriptPath) {
     if (typeof entry.timestamp === 'string') {
       if (result.startedAt === null || entry.timestamp < result.startedAt) result.startedAt = entry.timestamp;
       if (result.endedAt === null || entry.timestamp > result.endedAt) result.endedAt = entry.timestamp;
+    }
+    if (result.cwd === null && typeof entry.cwd === 'string' && entry.cwd.length > 0) {
+      result.cwd = entry.cwd;
     }
 
     try {
