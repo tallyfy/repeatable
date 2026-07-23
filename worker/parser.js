@@ -24,20 +24,18 @@ const MAX_BYTES = 64 * 1024 * 1024; // 64 MB safety cap
 const SKIP_RATIO_LIMIT = 0.2;
 const MIN_LINES_FOR_RATIO = 10;
 
-// Known top-level entry types. Entries with other `type` values count as
-// skipped (unknown shape), which is what drives the fail-loud ratio.
-const KNOWN_TYPES = new Set([
-  'user',
-  'assistant',
-  'system',
-  'summary',
-  'progress',
-  'attachment',
-  'diagnostic',
-  'file-history-snapshot',
-  'queued-command',
-  'x-testing'
-]);
+// Version pinning philosophy (calibrated against real transcripts,
+// 2026-07, Claude Code 2.1.218): transcripts contain many auxiliary
+// entry types beyond user/assistant (observed: attachment, mode,
+// permission-mode, last-prompt, pr-link, queue-operation, ai-title,
+// system, agent-name, file-history-snapshot, summary, ...), and new ones
+// appear across releases. Unknown TYPES are therefore recognized-ignored
+// noise, counted in `otherTypes`, never failures. The fail-loud skip
+// ratio pins what extraction actually depends on: lines that do not
+// parse as JSON objects with a string `type`, and user/assistant entries
+// whose message shape (role + content) is not one we understand. If that
+// inner shape changes on a release, sessions go `parse_failed` and
+// /repeatable:status says so.
 
 // Text wrappers that are not human prompts even though they arrive as
 // user-role entries: slash-command envelopes, command output echoes,
@@ -129,6 +127,7 @@ function parseTranscript(transcriptPath) {
     cwd: null,
     lineCount: 0,
     skipped: 0,
+    otherTypes: 0,
     contentBytes: 0,
     note: null
   };
@@ -166,7 +165,7 @@ function parseTranscript(transcriptPath) {
       result.skipped++;
       continue;
     }
-    if (typeof entry.type !== 'string' || !KNOWN_TYPES.has(entry.type)) {
+    if (typeof entry.type !== 'string') {
       result.skipped++;
       continue;
     }
@@ -181,13 +180,27 @@ function parseTranscript(transcriptPath) {
 
     try {
       if (entry.type === 'user') {
+        const msg = entry.message;
+        if (!msg || msg.role !== 'user' ||
+            (typeof msg.content !== 'string' && !Array.isArray(msg.content))) {
+          // A user entry we cannot read: this is the format-change signal.
+          result.skipped++;
+          continue;
+        }
         const prompt = humanPromptFrom(entry);
         if (prompt !== null) result.prompts.push(prompt);
       } else if (entry.type === 'assistant') {
+        const msg = entry.message;
+        if (!msg || msg.role !== 'assistant' || !Array.isArray(msg.content)) {
+          result.skipped++;
+          continue;
+        }
         const calls = toolCallsFrom(entry);
         for (const c of calls) result.toolCalls.push(c);
+      } else {
+        // Auxiliary entry type: recognized-ignored.
+        result.otherTypes++;
       }
-      // All other known types are recognized and deliberately ignored.
     } catch (_) {
       result.skipped++;
     }
@@ -203,4 +216,4 @@ function parseTranscript(transcriptPath) {
   return result;
 }
 
-module.exports = { parseTranscript, argDigest, stableStringify, KNOWN_TYPES, SKIP_RATIO_LIMIT };
+module.exports = { parseTranscript, argDigest, stableStringify, SKIP_RATIO_LIMIT };

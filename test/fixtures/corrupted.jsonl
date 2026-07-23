@@ -1,12 +1,12 @@
 {"type":"user","message":{"role":"user","content":"One valid prompt in a sea of noise"},"timestamp":"2026-07-02T11:00:00.000Z","cwd":"/home/tester/fakerepo"}
 this line is not json at all
-{"type":"mystery-shape-a","x":1}
-{"type":"mystery-shape-b","y":2}
 {broken json here
-{"type":"mystery-shape-c","z":3}
 also definitely not json
-{"type":"mystery-shape-d","w":4}
+%%% still not json %%%
+{"type":"user","message":{"content":42},"timestamp":"2026-07-02T11:00:30.000Z"}
+{"type":"user","note":"a user entry with no message at all"}
+{"type":"user","message":{"role":"user","content":{"unexpected":"object shape"}},"timestamp":"2026-07-02T11:00:40.000Z"}
+{"type":"assistant","message":{"role":"assistant","content":"content should be an array here"},"timestamp":"2026-07-02T11:00:50.000Z"}
+{"type":"assistant","note":"an assistant entry with no message"}
 {"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t","name":"Read","input":{}}]},"timestamp":"2026-07-02T11:01:00.000Z","cwd":"/home/tester/fakerepo"}
-{"type":"mystery-shape-e","v":5}
-{"type":"mystery-shape-f","u":6}
-{"type":"mystery-shape-g","t":7}
+{"type":"summary","summary":"one harmless auxiliary line","leafUuid":"cc"}

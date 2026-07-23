@@ -31,13 +31,45 @@ test('gen1 fixture: extracts prompts and tool calls, excludes results and comman
   assert.ok(r.startedAt < r.endedAt);
 });
 
-test('gen2 fixture: unknown fields and types tolerated below the ratio', () => {
+test('gen2 fixture: unknown fields and entry types are tolerated noise', () => {
   const r = parser.parseTranscript(path.join(FIXTURES, 'gen2-future.jsonl'));
   assert.strictEqual(r.status, 'ok');
   assert.strictEqual(r.prompts.length, 2);
   assert.deepStrictEqual(r.toolCalls.map((c) => c.name), ['Grep', 'Write']);
-  // The brand-new-entry-kind line counts as skipped but does not fail
-  assert.strictEqual(r.skipped, 1);
+  // Unknown entry TYPES are recognized-ignored (otherTypes), never skips:
+  // the transcript format grows auxiliary types on any release.
+  assert.strictEqual(r.skipped, 0);
+  assert.ok(r.otherTypes >= 1);
+});
+
+test('a transcript dominated by auxiliary types still parses ok (real-world shape)', () => {
+  // Mirrors the observed real composition: many auxiliary entries per
+  // human prompt (attachment, mode, last-prompt, queue-operation, ...).
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rpt-parser-'));
+  const aux = ['attachment', 'mode', 'permission-mode', 'last-prompt', 'pr-link', 'queue-operation', 'ai-title', 'agent-name', 'system'];
+  const lines = [synth.userLine('the only human prompt here', '2026-07-04', 9, 0)];
+  for (let i = 0; i < 30; i++) {
+    lines.push({ type: aux[i % aux.length], timestamp: synth.ts('2026-07-04', 9, i + 1), whatever: i });
+  }
+  const p = synth.writeTranscript(dir, 's-aux', lines);
+  const r = parser.parseTranscript(p);
+  assert.strictEqual(r.status, 'ok', 'auxiliary types must never trip the fail-loud ratio');
+  assert.deepStrictEqual(r.prompts, ['the only human prompt here']);
+  assert.strictEqual(r.otherTypes, 30);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('malformed user/assistant message shapes count toward fail-loud', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rpt-parser-'));
+  const lines = [
+    { type: 'user', message: { content: 42 } },
+    { type: 'user', note: 'no message' },
+    { type: 'assistant', message: { role: 'assistant', content: 'not an array' } }
+  ];
+  const p = synth.writeTranscript(dir, 's-malformed', lines);
+  const r = parser.parseTranscript(p);
+  assert.strictEqual(r.skipped, 3);
+  fs.rmSync(dir, { recursive: true, force: true });
 });
 
 test('corrupted fixture: fail-loud parse_failed past 20 percent skips', () => {
