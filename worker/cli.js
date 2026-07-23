@@ -172,8 +172,14 @@ const commands = {
     if (!allowed.includes(status)) fail('status must be one of ' + allowed.join(', '));
     const db = openDb();
     try {
-      const c = dbMod.getClusterByFingerprint(db, fp);
-      if (!c) fail('no cluster with fingerprint ' + fp);
+      let c = dbMod.getClusterByFingerprint(db, fp);
+      if (!c) {
+        // Import fingerprints have no detected cluster; create a minimal
+        // row so local dedupe works for them too.
+        db.prepare('INSERT INTO clusters (fingerprint, status, session_count, updated_at) VALUES (?, ?, 0, ?)')
+          .run(fp, 'proposed', new Date().toISOString());
+        c = dbMod.getClusterByFingerprint(db, fp);
+      }
       const blueprintId = arg('blueprint-id');
       const checksum = arg('checksum');
       const now = new Date().toISOString();

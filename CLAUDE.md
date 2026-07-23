@@ -111,6 +111,13 @@ claude plugin validate . --strict
 claude --plugin-dir .           # manual smoke: /repeatable:status
 ```
 
+Known validator advisory: validating the plugin WITHOUT the marketplace
+manifest warns that a root CLAUDE.md is not loaded as project context
+for plugin users. Deliberate: this file is the contributor guide for
+people working in the repo, not runtime context for plugin users (the
+skills carry all runtime instructions). Repo-root validation, which is
+what CI runs, passes --strict.
+
 There is no build step. There are no dependencies to install.
 
 CI (GitHub Actions): ubuntu + macos + windows, Node 22 and 24, `node
