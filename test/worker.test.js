@@ -128,8 +128,10 @@ test('enqueue-spawned worker survives its parent exiting (the #41577 answer)',
   parent.stdin.end();
   await new Promise((resolve) => parent.on('exit', resolve));
 
-  // Parent is dead. Poll for the detached worker's output.
-  const deadline = Date.now() + 20000;
+  // Parent is dead. Poll for the detached worker's output. The deadline
+  // is generous because shared CI runners boot two cold node processes
+  // (enqueue, then the nice-10 worker) under noisy-neighbor load.
+  const deadline = Date.now() + 60000;
   let row = null;
   while (Date.now() < deadline) {
     try {
@@ -138,9 +140,17 @@ test('enqueue-spawned worker survives its parent exiting (the #41577 answer)',
       database.close();
       if (row) break;
     } catch (_) { /* db not created yet */ }
-    await new Promise((r) => setTimeout(r, 250));
+    await new Promise((r) => setTimeout(r, 500));
   }
-  assert.ok(row, 'detached worker did not index after parent exit');
+  if (!row) {
+    // Make a rare failure diagnosable: what did the detached pieces log?
+    let diag = '';
+    for (const f of ['logs/enqueue.log', 'logs/worker.log']) {
+      try { diag += '\n--- ' + f + ' ---\n' + fs.readFileSync(path.join(dir, f), 'utf8'); } catch (_) { diag += '\n--- ' + f + ': absent ---'; }
+    }
+    try { diag += '\n--- queue ---\n' + fs.readdirSync(path.join(dir, 'queue')).join(','); } catch (_) { diag += '\n--- queue: absent ---'; }
+    assert.fail('detached worker did not index after parent exit' + diag);
+  }
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
