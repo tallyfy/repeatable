@@ -73,8 +73,8 @@ your existing session history, and writes your preferences.
 
 **Prerequisites:**
 
-- Claude Code (a current version; plugin features used here need v2.1.154
-  or later)
+- Claude Code, current release (the plugin is developed and tested
+  against v2.1.218; older versions may lack plugin features it uses)
 - Node.js 22.13 or newer on your PATH (Node 24 LTS recommended). The
   plugin's background pieces are plain Node scripts with zero npm
   dependencies; the local index uses Node's built-in `node:sqlite`. If Node
