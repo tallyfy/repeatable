@@ -7,8 +7,10 @@ operations; the Tallyfy MCP server intentionally rejects bulk mutations.
 
 Tool names below match the Tallyfy MCP server's template/field surface.
 If a named tool is missing from the connected server (surfaces evolve),
-find the equivalent in the current tool list before improvising; as a
-last resort the server exposes a generic `tallyfy_api_call` passthrough.
+find the equivalent in the current tool list before improvising. As a
+last resort the server has generic `tallyfy_api_read` and `tallyfy_api_write`
+fallback tools, but they refuse unless the deployment has enabled them, so do
+not count on them.
 
 ## Field type mapping
 
