@@ -58,19 +58,39 @@ test('every variable the plugin reads is on the keep list', () => {
   assert.deepStrictEqual(missing, []);
 });
 
-test('no spawn site hands the child the whole environment', () => {
+function shippedJs() {
+  // Tests ship inside the plugin too, and the directory validator reads
+  // them, so every .js folder the plugin carries is in scope.
+  const out = [];
+  for (const dir of ['scripts', 'worker', 'test', 'test/helpers']) {
+    const abs = path.join(ROOT, dir);
+    if (!fs.existsSync(abs)) continue;
+    for (const name of fs.readdirSync(abs)) {
+      if (name.endsWith('.js')) out.push(path.join(dir, name));
+    }
+  }
+  return out;
+}
+
+test('no shipped file hands a child the whole environment', () => {
   // Built from pieces so this file does not contain the shapes it hunts.
   const whole = [
     'env: process' + '.env',
-    'Object.assign({}, process' + '.env'
+    'Object.assign({}, process' + '.env',
+    '...process' + '.env'
   ];
+  const files = shippedJs();
+  assert.ok(files.length >= 15, 'expected at least 15 .js files, found ' + files.length);
   const offenders = [];
-  for (const rel of SPAWN_SITES) {
+  for (const rel of files) {
     const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
     for (const shape of whole) if (src.includes(shape)) offenders.push(rel + ': ' + shape);
-    assert.ok(src.includes('workerEnv('), rel + ' must build its child env with workerEnv');
   }
   assert.deepStrictEqual(offenders, []);
+  for (const rel of SPAWN_SITES) {
+    const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+    assert.ok(src.includes('workerEnv('), rel + ' must build its child env with workerEnv');
+  }
 });
 
 test('the whole-environment check can see the shape it hunts', () => {

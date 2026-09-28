@@ -12,6 +12,7 @@ const indexer = require('../worker/indexer');
 const cluster = require('../worker/cluster');
 const configMod = require('../worker/config');
 const synth = require('./helpers/synth');
+const { workerEnv } = require('../worker/env');
 
 const CONFIG = configMod.DEFAULTS;
 const CLI = path.join(__dirname, '..', 'worker', 'cli.js');
@@ -151,7 +152,7 @@ test('dismissed clusters stay tombstoned until membership doubles', () => {
 
   // Dismiss through the real CLI
   const res = spawnSync(process.execPath, [CLI, 'mark', '--fingerprint', fp, '--status', 'dismissed'],
-    { env: Object.assign({}, process.env, { REPEATABLE_DATA_DIR: dataDir }), encoding: 'utf8' });
+    { env: workerEnv({ REPEATABLE_DATA_DIR: dataDir }), encoding: 'utf8' });
   assert.strictEqual(res.status, 0, res.stdout + res.stderr);
 
   // One more occurrence: 4 < 3*2, stays dismissed
