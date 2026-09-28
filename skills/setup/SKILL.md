@@ -40,7 +40,7 @@ Full details: PRIVACY.md in the plugin repository.
 
 ## Step 3: Tallyfy MCP connection
 
-The plugin bundles the Tallyfy MCP server (https://mcp.tallyfy.com/mcp).
+The plugin bundles the Tallyfy MCP server (https://mcp.tallyfy.com/).
 Check whether Tallyfy MCP tools (for example `get_template`,
 `create_template`) are available in this session:
 
@@ -51,7 +51,7 @@ Check whether Tallyfy MCP tools (for example `get_template`,
 - If the server is absent entirely: give the manual fallback:
 
   ```
-  claude mcp add --transport http tallyfy https://mcp.tallyfy.com/mcp
+  claude mcp add --transport http tallyfy https://mcp.tallyfy.com/
   ```
 
 - If the user has no Tallyfy account, that is fine: detection and

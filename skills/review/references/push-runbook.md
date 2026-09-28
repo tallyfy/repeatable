@@ -2,7 +2,7 @@
 
 Executed ONLY after explicit user approval of a rendered draft. Uses the
 user's own authenticated Tallyfy MCP connection (server `tallyfy`,
-https://mcp.tallyfy.com/mcp). All calls are sequential single-item
+https://mcp.tallyfy.com/). All calls are sequential single-item
 operations; the Tallyfy MCP server intentionally rejects bulk mutations.
 
 Tool names below match the Tallyfy MCP server's template/field surface.
