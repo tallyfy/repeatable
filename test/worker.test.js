@@ -9,13 +9,14 @@ const { spawnSync, spawn } = require('child_process');
 
 const dbMod = require('../worker/db');
 const synth = require('./helpers/synth');
+const { workerEnv } = require('../worker/env');
 
 const WORKER = path.join(__dirname, '..', 'worker', 'worker.js');
 const ENQUEUE = path.join(__dirname, '..', 'scripts', 'enqueue.js');
 const CLI = path.join(__dirname, '..', 'worker', 'cli.js');
 
 function env(dataDir, projectsRoot) {
-  return Object.assign({}, process.env, {
+  return workerEnv({
     REPEATABLE_DATA_DIR: dataDir,
     REPEATABLE_PROJECTS_ROOT: projectsRoot || path.join(dataDir, 'no-projects')
   });
@@ -113,7 +114,7 @@ test('enqueue-spawned worker survives its parent exiting (the #41577 answer)',
   // A short-lived parent runs enqueue (real spawn enabled) and dies
   // immediately. The detached worker must finish indexing anyway.
   const parent = spawn(process.execPath, [ENQUEUE], {
-    env: Object.assign({}, process.env, {
+    env: workerEnv({
       REPEATABLE_DATA_DIR: dir,
       REPEATABLE_PROJECTS_ROOT: path.join(dir, 'no-projects')
     }),

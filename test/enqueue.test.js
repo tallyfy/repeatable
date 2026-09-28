@@ -6,6 +6,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { workerEnv } = require('../worker/env');
 
 const ENQUEUE = path.join(__dirname, '..', 'scripts', 'enqueue.js');
 
@@ -13,7 +14,7 @@ function runEnqueue(input, dataDir) {
   return spawnSync(process.execPath, [ENQUEUE], {
     input,
     encoding: 'utf8',
-    env: Object.assign({}, process.env, {
+    env: workerEnv({
       REPEATABLE_DATA_DIR: dataDir,
       REPEATABLE_NO_SPAWN: '1'
     }),

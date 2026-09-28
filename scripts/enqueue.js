@@ -91,11 +91,14 @@ function main() {
 
       if (process.env.REPEATABLE_NO_SPAWN !== '1') {
         const workerPath = path.join(__dirname, '..', 'worker', 'worker.js');
+        // Required here, inside the try, so a missing file can only cost
+        // the spawn and never the queue write above (#13).
+        const { workerEnv } = require('../worker/env');
         const child = spawn(process.execPath, [workerPath], {
           detached: true,
           stdio: 'ignore',
           windowsHide: true,
-          env: Object.assign({}, process.env, { REPEATABLE_DATA_DIR: base })
+          env: workerEnv({ REPEATABLE_DATA_DIR: base })
         });
         child.unref();
       }
