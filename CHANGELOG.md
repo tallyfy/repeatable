@@ -6,6 +6,18 @@ when the `version` field in `.claude-plugin/plugin.json` changes.
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-09-28
+
+Clears what Anthropic's Claude directory portal reported on 0.1.1.
+
+- The background worker now starts with only the environment variables it
+  reads, instead of a copy of the whole environment.
+- `worker/cluster.js` writes its key separator as an escape, so the file is
+  plain text rather than reading as binary.
+- The redaction test builds its fake secrets from pieces, so the shipped
+  file holds no credential-shaped literal.
+- `plugin.json` names the privacy policy.
+
 ## [0.1.1] - 2026-09-28
 
 - The bundled Tallyfy MCP server now uses `https://mcp.tallyfy.com/`, the

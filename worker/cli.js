@@ -280,7 +280,7 @@ const commands = {
     if (process.argv.includes('--deep')) args.push('--deep');
     const res = spawnSync(process.execPath, args, {
       stdio: 'ignore',
-      env: process.env,
+      env: require('./env').workerEnv(),
       timeout: 10 * 60 * 1000
     });
     const db = dbMod.available() ? dbMod.open(paths.dbPath()) : null;
