@@ -17,15 +17,31 @@ const ROOT = path.join(__dirname, '..');
 const SPAWN_SITES = ['scripts/enqueue.js', 'worker/cli.js'];
 
 test('workerEnv drops a variable it was not told to keep', () => {
-  const planted = 'RPT_PLANTED_' + process.pid;
-  process.env[planted] = 'must-not-reach-the-child';
+  // A fixed name, read and written literally: the directory validator
+  // treats an environment read under a computed name as a possible
+  // credential grab, and this file ships inside the plugin.
+  process.env.RPT_PLANTED_FAKE = 'must-not-reach-the-child';
   try {
     const env = workerEnv({ REPEATABLE_DATA_DIR: '/tmp/x' });
-    assert.strictEqual(env[planted], undefined);
+    assert.strictEqual(env.RPT_PLANTED_FAKE, undefined);
     assert.strictEqual(env.REPEATABLE_DATA_DIR, '/tmp/x');
   } finally {
-    delete process.env[planted];
+    delete process.env.RPT_PLANTED_FAKE;
   }
+});
+
+test('KEEP is read off the source and is not empty', () => {
+  assert.ok(KEEP.length >= 15, 'expected at least 15 names, found ' + KEEP.length);
+  assert.ok(KEEP.includes('PATH') && KEEP.includes('CLAUDE_CONFIG_DIR'));
+});
+
+test('no shipped file reads the environment under a computed name', () => {
+  // Built from pieces so this file does not contain the shape it hunts.
+  const computed = new RegExp('process' + '\\.env\\[');
+  const offenders = shippedJs().filter((rel) =>
+    computed.test(fs.readFileSync(path.join(ROOT, rel), 'utf8')));
+  assert.deepStrictEqual(offenders, []);
+  assert.ok(computed.test('x = process' + '.env[name]'), 'the pattern must see the shape');
 });
 
 test('workerEnv keeps what the worker reads', () => {
@@ -49,7 +65,7 @@ test('every variable the plugin reads is on the keep list', () => {
     for (const name of fs.readdirSync(path.join(ROOT, dir))) {
       if (!name.endsWith('.js')) continue;
       const src = fs.readFileSync(path.join(ROOT, dir, name), 'utf8');
-      for (const m of src.matchAll(/process\.env\.([A-Z_]+)/g)) read.add(m[1]);
+      for (const m of src.matchAll(/process\.env\.([A-Za-z_]+)/g)) read.add(m[1]);
     }
   }
   assert.ok(read.size >= 4, 'expected at least 4 variables read, found ' + read.size);
