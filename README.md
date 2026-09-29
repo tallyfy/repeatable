@@ -69,7 +69,10 @@ claude --plugin-dir ./repeatable
 
 Then run `/repeatable:setup` once. It checks prerequisites, walks you
 through connecting the Tallyfy MCP server (mcp.tallyfy.com), offers to index
-your existing session history, and writes your preferences.
+your existing session history, and writes your preferences. Repeatable does
+not bundle the Tallyfy server itself. It uses the Tallyfy connection you
+already have, such as the Tallyfy plugin or connector, so installing both
+does not give you two copies of the Tallyfy tools.
 
 **Prerequisites:**
 
