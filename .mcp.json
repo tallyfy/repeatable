@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "tallyfy": {
-      "type": "http",
-      "url": "https://mcp.tallyfy.com/"
-    }
-  }
-}

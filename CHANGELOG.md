@@ -6,6 +6,16 @@ when the `version` field in `.claude-plugin/plugin.json` changes.
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-09-29
+
+- Repeatable no longer bundles its own Tallyfy MCP server. It uses the
+  Tallyfy connection you already have (the Tallyfy plugin, the Tallyfy
+  connector, or a server added with `claude mcp add`), so installing it next
+  to the Tallyfy plugin no longer adds a second copy of the Tallyfy tools.
+  If you relied on the bundled server, run `/repeatable:setup` to connect
+  Tallyfy again. Detection and review work without it; only the push step
+  needs Tallyfy.
+
 ## [0.1.2] - 2026-09-28
 
 Clears what Anthropic's Claude directory portal reported on 0.1.1.

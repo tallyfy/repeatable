@@ -29,7 +29,8 @@ worker/                          stdlib + node:sqlite only (no npm deps)
   redact.js                      secret patterns (ingest gate + outbound gate)
   paths.js                       data dir / projects root resolution
   cli.js                         JSON commands the skills call
-.mcp.json                        Tallyfy remote MCP server (type http)
+(no .mcp.json)                   the Tallyfy server is NOT bundled; the user's
+                                 own Tallyfy connection supplies the tools
 test/                            node:test + synthetic fixtures; zero test-framework deps
 ```
 

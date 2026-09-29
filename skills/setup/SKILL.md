@@ -40,7 +40,9 @@ Full details: PRIVACY.md in the plugin repository.
 
 ## Step 3: Tallyfy MCP connection
 
-The plugin bundles the Tallyfy MCP server (https://mcp.tallyfy.com/).
+Repeatable does not bundle a Tallyfy server. It uses the Tallyfy
+connection the user already has: the Tallyfy plugin, the Tallyfy
+connector in their Claude account, or a server added in Claude Code.
 Check whether Tallyfy MCP tools (for example `get_template`,
 `create_template`) are available in this session:
 
@@ -48,11 +50,14 @@ Check whether Tallyfy MCP tools (for example `get_template`,
   tool (for example listing templates) and report success.
 - If the server is present but not authenticated: tell the user to run
   `/mcp` and complete the Tallyfy OAuth sign-in, then re-run setup.
-- If the server is absent entirely: give the manual fallback:
+- If no Tallyfy tools are present: tell the user to connect Tallyfy
+  once. In Claude Code, run:
 
   ```
   claude mcp add --transport http tallyfy https://mcp.tallyfy.com/
   ```
+
+  Then run `/mcp`, complete the Tallyfy OAuth sign-in, and re-run setup.
 
 - If the user has no Tallyfy account, that is fine: detection and
   review still work; only the push step needs Tallyfy. Note it and move
