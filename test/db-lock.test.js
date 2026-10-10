@@ -19,6 +19,12 @@ const dbMod = require('../worker/db');
 // statement that waits succeeds.
 const HOLD_MS = 1500;
 
+// Windows can keep a just-closed file busy for a moment (EBUSY, EPERM),
+// so let rmSync retry instead of failing the test on cleanup.
+function removeDir(dir) {
+  fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 });
+}
+
 // Runs in a child process, because node:sqlite is synchronous: a holder in
 // this process could never commit while our statement waits. It opens the
 // file directly (not through db.open), starts a write transaction, waits
@@ -65,7 +71,9 @@ async function whileAnotherConnectionWrites(dbPath, sql, action) {
   let err = '';
   holder.stdout.on('data', (d) => { out += d; });
   holder.stderr.on('data', (d) => { err += d; });
-  const exited = new Promise((resolve) => holder.on('exit', (code) => resolve(code)));
+  // 'close', not 'exit': on Windows 'exit' can fire before the holder's
+  // last stdout line has been read.
+  const exited = new Promise((resolve) => holder.on('close', (code) => resolve(code)));
   try {
     await new Promise((resolve, reject) => {
       const check = () => { if (out.includes('locked')) resolve(); };
@@ -117,7 +125,7 @@ test('open() on a fresh file waits for another connection\'s write transaction',
     assert.strictEqual(database.prepare('SELECT x FROM holder').get().x, 1, 'the holder\'s committed row is visible');
   } finally {
     if (database) database.close();
-    fs.rmSync(dir, { recursive: true, force: true });
+    removeDir(dir);
   }
 });
 
@@ -135,6 +143,6 @@ test('a write on an open handle waits for another connection\'s write transactio
     assert.strictEqual(dbMod.getMeta(database, 'waiter'), '2');
   } finally {
     database.close();
-    fs.rmSync(dir, { recursive: true, force: true });
+    removeDir(dir);
   }
 });
