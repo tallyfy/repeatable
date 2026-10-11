@@ -31,6 +31,13 @@ try {
 
 const SCHEMA_VERSION = 1;
 
+// How long a statement waits for another connection's lock before it fails
+// with "database is locked". The detached worker, cli.js (status, review,
+// push) and tests can open the same file at the same moment, for example
+// while one connection is switching a fresh file to WAL or checkpointing
+// on close. Without a busy timeout SQLite fails at once instead of waiting.
+const BUSY_TIMEOUT_MS = 5000;
+
 function available() {
   return !!DatabaseSync;
 }
@@ -50,9 +57,43 @@ function open(dbPath) {
   }
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });
   const db = new DatabaseSync(dbPath);
-  db.exec('PRAGMA journal_mode = WAL;');
+  // First, so every statement after it waits instead of failing. It reads
+  // nothing from the file, so it cannot hit the lock itself. A PRAGMA rather
+  // than the DatabaseSync `timeout` option, which Node only added in 22.16
+  // (our floor is 22.13).
+  db.exec('PRAGMA busy_timeout = ' + BUSY_TIMEOUT_MS + ';');
+  enableWal(db);
   migrate(db);
   return db;
+}
+
+// Switch the file to WAL (a no-op once it is WAL). On a fresh file another
+// connection can be writing, or switching the file itself, at the same
+// moment. SQLite then fails this statement at once with "database is
+// locked" and skips the busy timeout, because it already holds a read lock
+// and waiting for the write lock could deadlock. So retry the statement
+// until the other connection is done, within the same time budget.
+function enableWal(db) {
+  const deadline = Date.now() + BUSY_TIMEOUT_MS;
+  for (;;) {
+    try {
+      db.exec('PRAGMA journal_mode = WAL;');
+      return;
+    } catch (err) {
+      if (!isBusy(err) || Date.now() >= deadline) throw err;
+      sleepSync(25);
+    }
+  }
+}
+
+// SQLITE_BUSY (5) or one of its extended codes. node:sqlite puts SQLite's
+// extended code on err.errcode in every release we support (22.13 on).
+function isBusy(err) {
+  return !!err && typeof err.errcode === 'number' && (err.errcode & 0xff) === 5;
+}
+
+function sleepSync(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
 
 function migrate(db) {
@@ -175,6 +216,7 @@ module.exports = {
   unavailableReason,
   open,
   SCHEMA_VERSION,
+  BUSY_TIMEOUT_MS,
   getMeta,
   setMeta,
   upsertSession,

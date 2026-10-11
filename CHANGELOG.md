@@ -6,6 +6,12 @@ when the `version` field in `.claude-plugin/plugin.json` changes.
 
 ## [Unreleased]
 
+- The background worker and the commands the skills run now wait briefly
+  when another process is using the local index, instead of failing with
+  "database is locked". Before, a worker that started while a skill such as
+  `/repeatable:status` had the index open could log that error and index
+  nothing until its next run.
+
 ## [0.1.3] - 2026-09-29
 
 - Repeatable no longer bundles its own Tallyfy MCP server. It uses the
