@@ -6,6 +6,9 @@ when the `version` field in `.claude-plugin/plugin.json` changes.
 
 ## [Unreleased]
 
+- The plugin carries the Tallyfy icon (`.claude-plugin/icon.png`), which the Claude
+  directory uses as the listing icon.
+
 - The background worker and the commands the skills run now wait briefly
   when another process is using the local index, instead of failing with
   "database is locked". Before, a worker that started while a skill such as

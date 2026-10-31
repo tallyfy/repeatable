@@ -34,5 +34,5 @@ jobs:
           if [ -n "$hits" ]; then echo "$hits"; exit 1; fi
       - name: ASCII-only committed files
         run: |
-          hits=$(LC_ALL=C grep -rlP '[^\x00-\x7F]' --exclude-dir=.git . || true)
+          hits=$(LC_ALL=C grep -rlP '[^\x00-\x7F]' --exclude-dir=.git --exclude='*.png' . || true)
           if [ -n "$hits" ]; then echo "non-ASCII found in:"; echo "$hits"; exit 1; fi
