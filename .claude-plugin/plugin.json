@@ -11,5 +11,6 @@
   "repository": "https://github.com/tallyfy/repeatable",
   "license": "MIT",
   "privacyPolicyUrl": "https://github.com/tallyfy/repeatable/blob/main/PRIVACY.md",
+  "icon": "./.claude-plugin/icon.png",
   "keywords": ["tallyfy", "process", "sop", "automation", "workflow"]
 }
